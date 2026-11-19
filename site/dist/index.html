@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TraceBrake：模拟订单故障回放，以及 Agent ID 策略权限核验。">
+  <meta name="referrer" content="no-referrer">
+  <title>TraceBrake｜交易 Agent 风控与审计</title>
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="frame top-inner">
+      <a href="#" class="brand" aria-label="TraceBrake 首页"><img src="./mark.svg" alt="" width="30" height="30">TraceBrake<span> / 风控实验台</span></a>
+      <nav aria-label="页面导航"><a href="#replay">故障回放</a><a href="#identity">链上权限</a></nav>
+      <span id="deploy-tag" class="status-chip">演示版</span>
+    </div>
+  </header>
+  <main class="frame">
+    <section class="intro" aria-labelledby="title">
+      <div>
+        <p class="eyebrow"><span></span> AGENT SAFETY LAB / 01</p>
+        <h1 id="title">订单没回执，<br>先刹车，再核对<span>。</span></h1>
+        <p class="lede">交易 Agent 发出订单后收不到回执，超时不等于下单失败。用一笔模拟订单，看它如何冻结新请求、按原编号查单，并保留可核对的过程。</p>
+        <a class="button orange" href="#replay">开始试玩 <span aria-hidden="true">↘</span></a>
+      </div>
+      <aside class="protocol" aria-label="风控流程概览">
+        <div class="protocol-title"><span>执行原则</span><code>TRACE / 001</code></div>
+        <div class="protocol-row"><b>01</b><span>只发一次</span><small>SUBMIT</small></div>
+        <div class="protocol-row"><b>02</b><span>未知即冻结</span><small>FREEZE</small></div>
+        <div class="protocol-row"><b>03</b><span>查回原单</span><small>RECONCILE</small></div>
+      </aside>
+    </section>
+    <section id="replay" class="module" aria-labelledby="replay-title">
+      <div class="module-title">
+        <p class="eyebrow"><span></span> 01 / FAULT REPLAY</p>
+        <h2 id="replay-title">回放一次订单超时</h2>
+        <p>先选查单结果，再运行模拟。所有订单、回执和报价均为演示数据。</p>
+      </div>
+      <div class="workbench">
+        <div class="work-main">
+          <div class="work-head">
+            <span id="run-badge" class="status-chip">就绪</span>
+            <span class="work-id">BTCUSDT <code>DEMO-001</code></span>
+          </div>
+          <fieldset class="scenarios">
+            <legend>回执场景</legend>
+            <label><input name="scenario" value="accepted" type="radio" checked><span>查到原单</span></label>
+            <label><input name="scenario" value="unknown" type="radio"><span>仍未查明</span></label>
+          </fieldset>
+          <div class="step-area">
+            <div class="step" data-step="send"><b>01</b><div><strong>发出原始请求</strong><small>模拟单 DEMO-001</small></div><span aria-hidden="true">○</span></div>
+            <div class="step" data-step="freeze"><b>02</b><div><strong>响应超时，冻结新请求</strong><small>保留未知状态和原订单编号</small></div><span aria-hidden="true">○</span></div>
+            <div class="step" data-step="query"><b>03</b><div><strong>仅查询原单</strong><small>根据回执决定是否继续交由人工核对</small></div><span aria-hidden="true">○</span></div>
+          </div>
+          <div class="control-row">
+            <button id="send-order" class="button orange" type="button">发出模拟订单</button>
+            <button id="query-order" class="button quiet" type="button" disabled>查询原单</button>
+            <button id="attempt-order" class="button quiet" type="button" disabled>尝试再发</button>
+            <button id="reset-replay" class="text-button" type="button">重置回放</button>
+          </div>
+        </div>
+        <aside class="ledger">
+          <h3>本次执行记录 <span>SIMULATED</span></h3>
+          <dl class="metrics">
+            <div><dt>模拟提交</dt><dd id="submit-count">0</dd></div>
+            <div><dt>只读查单</dt><dd id="query-count">0</dd></div>
+          </dl>
+          <p id="replay-result" class="receipt" role="status">尚未发出请求。</p>
+          <ol id="journal" class="journal" aria-label="模拟事件"></ol>
+          <button id="download-log" class="text-button" type="button" disabled>下载本次模拟日志 ↓</button>
+        </aside>
+      </div>
+    </section>
+    <section id="identity" class="module" aria-labelledby="identity-title">
+      <div class="module-title">
+        <p class="eyebrow"><span></span> 02 / AGENT ID PERMISSION</p>
+        <h2 id="identity-title">谁可以运行这个模拟策略？</h2>
+        <p>回放区随时可用。链上模式只为持有 Agent ID 的地址登记有期限的模拟权限；撤回、过期或无法核验后都无法发起新模拟订单。</p>
+      </div>
+      <div class="identity-grid">
+        <div class="chain-card">
+          <div class="work-head"><span id="chain-badge" class="status-chip">等待部署</span><span class="work-id">BNB SMART CHAIN / 56</span></div>
+          <p id="chain-intro">当前公开版可试玩订单回放。链上入口将在项目合约核验后启用。</p>
+          <p id="chain-explorer" hidden><a id="contract-link" target="_blank" rel="noopener noreferrer">查看项目合约源码 ↗</a> <a id="deploy-tx-link" target="_blank" rel="noopener noreferrer">查看部署交易 ↗</a></p>
+          <div id="chain-interactions" hidden>
+            <form id="check-permission">
+              <label for="holder">你自己的 Agent ID 钱包地址 <span>公开地址</span></label>
+              <input id="holder" type="text" placeholder="0x…" autocomplete="off" spellcheck="false" required>
+              <div class="control-row">
+                <button id="prepare-grant" class="button orange" type="button">生成授权预览</button>
+                <button id="refresh-chain" class="button quiet" type="submit">核验链上权限</button>
+                <button id="prepare-revoke" class="text-button" type="button">生成撤回预览</button>
+              </div>
+            </form>
+            <div id="call-card" class="call-card" hidden>
+              <h3 id="call-title"></h3>
+              <p id="call-detail"></p>
+              <code id="call-command"></code>
+              <button id="copy-call" class="text-button" type="button">复制官方 CLI 预览命令</button>
+              <p class="mini">请在你自己的 Agentic Wallet 开发环境预览并自行确认。返回网页后点击「核验链上权限」。</p>
+            </div>
+            <p id="chain-result" class="receipt" role="status">未读取链上权限。</p>
+            <button id="send-gated" type="button" class="button quiet">用链上权限发起模拟订单</button>
+          </div>
+        </div>
+        <aside class="boundaries">
+          <h3>权限只管模拟</h3>
+          <ul>
+            <li><strong>自己确认：</strong> 只有实际调用地址能设置或撤回自己的权限。</li>
+            <li><strong>不托管：</strong> 合约不收币，不请求代币授权，没有可替用户修改权限的管理员。</li>
+            <li><strong>可核对：</strong> 链上只记录权限变更。回放日志是模拟记录，不代表交易所成交。</li>
+          </ul>
+          <p class="mini">链上交互可能产生网络手续费。网页不提供 Agentic Wallet 扫码或配对登录，不要求密钥、配对码或交易所 API 凭据。</p>
+          <a href="https://web3.binance.com/zh-CN/dev-docs/products/agentic-wallet/use-cases/developer-mode" target="_blank" rel="noopener noreferrer">钱包开发者模式说明 ↗</a>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <footer class="frame footer"><span>TraceBrake / Agent 风控演示</span><span>模拟订单 · 公开链上权限 · 无实盘交易</span></footer>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

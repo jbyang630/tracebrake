@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>TraceBrake｜60 秒产品演示</title>
+  <meta name="description" content="观看 TraceBrake 公开试玩实录：体验重复订单拦截、原单核对与 Agent ID 主网资格检查。">
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    .film{max-width:1024px;margin:clamp(28px,6vw,64px) auto;padding:0 20px}
+    .film h1{font-size:clamp(30px,5vw,52px);margin:28px 0 12px}
+    .film p{font-size:17px;color:#54514b;max-width:48em}
+    .film video{display:block;width:100%;aspect-ratio:16/9;background:#16231f;border-radius:8px;margin:24px 0 18px}
+    .film .links{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="frame top-inner"><a class="brand" href="./"><img src="./mark.svg" width="30" height="30" alt="">TraceBrake<span> / 风控实验台</span></a></div></header>
+  <main class="film">
+    <h1>60 秒产品演示</h1>
+    <p>从一笔超时的模拟订单开始，看系统如何拦住重发、核对原单，再用主网合约判断谁有权运行模拟策略。</p>
+    <video controls playsinline preload="none" poster="./tracebrake-poster.jpg" aria-label="TraceBrake 产品演示，中文旁白及内嵌字幕">
+      <source src="./tracebrake-demo.mp4" type="video/mp4">
+      <a href="./tracebrake-demo.mp4">下载演示视频</a>
+    </video>
+    <div class="links"><a class="button orange" href="./">打开试玩页</a><a href="./tracebrake-demo.mp4" download="TraceBrake-产品演示.mp4">下载 MP4</a></div>
+  </main>
+  <script type="module">
+    const video = document.querySelector('video');
+    // 完整载入这段短片，让访客在不支持分段下载的托管环境也能拖动进度条。
+    try {
+      const response = await fetch(video.querySelector('source').src);
+      if (!response.ok) throw new Error('视频下载失败');
+      const clip = await response.blob();
+      const playing = !video.paused;
+      const position = video.currentTime;
+      video.preload = 'metadata';
+      video.src = URL.createObjectURL(clip);
+      if (playing || position > 0) {
+        video.addEventListener('loadedmetadata', () => {
+          video.currentTime = position;
+          if (playing) video.play().catch(() => video.pause());
+        }, { once: true });
+      }
+      video.load();
+    } catch {
+      // 文件仍可通过浏览器原生播放器或页面的下载链接打开。
+      video.preload = 'metadata';
+    }
+  </script>
+</body>
+</html>
