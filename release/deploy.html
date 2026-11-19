@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light">
+  <title>TraceBrake｜主网部署确认</title>
+  <link rel="stylesheet" href="deploy.css">
+</head>
+<body>
+  <main>
+    <header><p>TRACEBRAKE / BNB SMART CHAIN</p><h1>确认部署 TraceBrake</h1><p>仅部署模拟权限合约。使用普通 EVM 浏览器钱包，由你本人在钱包中签名；这是本机部署页。</p></header>
+    <dl><div><dt>网络</dt><dd>BNB 智能链主网 · 56</dd></div><div><dt>操作</dt><dd>创建合约 · 无收款地址</dd></div><div><dt>转账金额</dt><dd>0 BNB（另付钱包显示的 Gas）</dd></div><div><dt>资金与权限</dt><dd>无托管、无提款、无管理员、无交易权限</dd></div><div><dt>编译版本</dt><dd id="compiler"></dd></div><div><dt>创建代码摘要</dt><dd id="creation" class="mono"></dd></div></dl>
+    <div class="actions">
+      <button id="inspect" type="button">连接钱包并估算费用</button>
+      <button id="request" type="button" disabled>在钱包中确认部署</button>
+    </div>
+    <p id="result" role="status">等待选择普通 EVM 浏览器钱包。</p>
+    <div id="known-tx" hidden><label for="tx-output">公开部署交易哈希</label>
+      <input id="tx-output" readonly type="text"><button id="copy-tx" type="button">复制交易哈希</button></div>
+    <div id="verify" hidden>
+      <h2>部署已核验，下一步公开验证源码</h2>
+      <p>点击 BscScan，在页面中选 <strong>Solidity (Standard-Json-Input)</strong>、<strong id="version"></strong>、许可证 <strong>MIT</strong>，上传下方 JSON。没有构造参数。</p>
+      <p><a id="verify-link" target="_blank" rel="noopener noreferrer">在 BscScan 验证源码 ↗</a> · <a href="./standard-input.json" download>下载验证用 JSON ↓</a> · <a id="receipt-link" target="_blank" rel="noopener noreferrer">查看部署回执 ↗</a></p>
+    </div>
+    <p class="note">本页不会要求助记词、私钥、API Secret 或币安登录。钱包提交后，先核对交易哈希，避免重复部署。</p>
+  </main>
+  <script type="module" src="./deploy.js"></script>
+</body>
+</html>

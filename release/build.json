@@ -1,0 +1,14 @@
+{
+  "compiler": "0.8.30+commit.73712a01",
+  "chainId": 56,
+  "optimizerRuns": 200,
+  "evmVersion": "paris",
+  "source": "TraceBrake.sol:TraceBrake",
+  "constructorArguments": "0x",
+  "license": "MIT",
+  "registry": "0x60b9262456de011f7d15a54cdd8c48baaa8b022f",
+  "policy": "0x5842afb2dc41b21c818414eb88d4422c6585d3b5205af439b83dade20815dd53",
+  "creationHash": "0xb24fe253fd7e815c260c6372a38f5b1c34f8ba7b8fc432ce7ecb51e0267188de",
+  "runtimeHash": "0x63218939a0066df95afa832c8ab2b0170e18c22c2ef0716eb344ac517332ccc3",
+  "creationBytes": 1526
+}

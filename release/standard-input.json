@@ -1,0 +1,24 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "TraceBrake.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.30;\n\ninterface ITraceBrakeAgentId {\n    function balanceOf(address holder) external view returns (uint256);\n}\n\n/// @notice 登记本人的 TraceBrake 模拟策略权限。无管理员、无资金入口、无交易能力。\ncontract TraceBrake {\n    address public constant AGENT_ID = address(bytes20(hex\"60b9262456de011f7d15a54cdd8c48baaa8b022f\"));\n    bytes32 public constant POLICY_ID =\n        keccak256(\"TraceBrake/v1:btc-demo:freeze-on-timeout:reconcile-original:no-resubmit\");\n    uint64 public constant MAX_DURATION = 1 days;\n\n    struct Permission {\n        uint64 validUntil;\n        bytes32 sessionId;\n    }\n    mapping(address holder => Permission) private permissions;\n\n    event DemoPermissionGranted(\n        address indexed holder, bytes32 indexed policy, bytes32 indexed sessionId, uint64 validUntil\n    );\n    event DemoPermissionRevoked(address indexed holder, bytes32 indexed policy, bytes32 indexed sessionId);\n\n    error WrongNetwork();\n    error NoAgentId();\n    error InvalidDuration();\n    error InvalidSession();\n    error NoPermission();\n\n    constructor() {\n        // 正式部署只使用 BNB 智能链主网的官方身份合约。\n        if (block.chainid != 56 || AGENT_ID.code.length == 0) revert WrongNetwork();\n    }\n\n    /// @notice 只有实际调用地址可以为自己登记权限；没有代授权接口。\n    function grantDemoPermission(uint64 durationSeconds, bytes32 sessionId) external {\n        if (sessionId == bytes32(0)) revert InvalidSession();\n        if (durationSeconds == 0 || durationSeconds > MAX_DURATION) revert InvalidDuration();\n        if (ITraceBrakeAgentId(AGENT_ID).balanceOf(msg.sender) == 0) revert NoAgentId();\n        uint64 validUntil = uint64(block.timestamp) + durationSeconds;\n        permissions[msg.sender] = Permission(validUntil, sessionId);\n        emit DemoPermissionGranted(msg.sender, POLICY_ID, sessionId, validUntil);\n    }\n\n    /// @notice 即使身份已失效，也允许本人撤回已有授权。\n    function revokeDemoPermission() external {\n        Permission memory permission = permissions[msg.sender];\n        if (permission.validUntil == 0) revert NoPermission();\n        delete permissions[msg.sender];\n        emit DemoPermissionRevoked(msg.sender, POLICY_ID, permission.sessionId);\n    }\n\n    /// @notice 同一次读取返回链上时间、资格和授权状态，客户端无需信任本机时间。\n    function permissionState(address holder)\n        external view returns (uint64 validUntil, uint64 chainTime, bool hasAgentId, bool active, bytes32 sessionId)\n    {\n        Permission storage permission = permissions[holder];\n        validUntil = permission.validUntil;\n        sessionId = permission.sessionId;\n        chainTime = uint64(block.timestamp);\n        hasAgentId = ITraceBrakeAgentId(AGENT_ID).balanceOf(holder) > 0;\n        active = hasAgentId && validUntil > chainTime;\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "paris",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode.object",
+          "evm.deployedBytecode.object"
+        ]
+      }
+    }
+  }
+}
