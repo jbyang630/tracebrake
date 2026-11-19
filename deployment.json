@@ -1,0 +1,11 @@
+{
+  "chainId": 56,
+  "contractAddress": "0xb9CC528eF28E28295e2691Ced02d5f7c6B13976c",
+  "deploymentTx": "0x41a5b642c0fe3edfc6eac736879819d011c6060ef16ae566209e091f50ddc2ea",
+  "block": 134429013,
+  "blockHash": "0xbfe260ada0e4d4717ad81b8d1bbe932e7a5b1b26c2137969971905d0f272995b",
+  "verifiedAtBlock": 134429535,
+  "verifiedAtBlockHash": "0xc40979b146f78e5bf02f8244229c62cf1f0a381be0b097ec015e71f14a3f421a",
+  "runtimeHash": "0x63218939a0066df95afa832c8ab2b0170e18c22c2ef0716eb344ac517332ccc3",
+  "creationHash": "0xb24fe253fd7e815c260c6372a38f5b1c34f8ba7b8fc432ce7ecb51e0267188de"
+}
